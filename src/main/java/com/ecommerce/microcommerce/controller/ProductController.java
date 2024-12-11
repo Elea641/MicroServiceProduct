@@ -1,10 +1,12 @@
 package com.ecommerce.microcommerce.controller;
 
 import com.ecommerce.microcommerce.dao.ProductDao;
+import com.ecommerce.microcommerce.exceptions.ProductNotFoundException;
 import com.ecommerce.microcommerce.model.Product;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +38,8 @@ public class ProductController {
     @GetMapping(value = "/products/{id}")
     public MappingJacksonValue productById(@PathVariable int id) {
         Product product = productDao.findById(id);
+        if(product == null) throw new ProductNotFoundException("The product with id " + id + " is NOT FOUND.");
+
         SimpleBeanPropertyFilter testFilter = SimpleBeanPropertyFilter.serializeAllExcept("purchasePrice");
         FilterProvider filterList = new SimpleFilterProvider().addFilter("testFilterDynamic", testFilter);
         MappingJacksonValue productFilter = new MappingJacksonValue(product);
@@ -64,7 +68,7 @@ public class ProductController {
     }
 
     @PostMapping(value = "/products")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product) {
         Product productAdded = productDao.save(product);
         if (Objects.isNull(productAdded)) {
             return ResponseEntity.noContent().build();
@@ -78,7 +82,7 @@ public class ProductController {
     }
 
     @PutMapping (value = "/products")
-    public void updateProduct(@RequestBody Product product)
+    public void updateProduct(@Valid @RequestBody Product product)
     {
         productDao.save(product);
     }

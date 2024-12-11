@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 
 //@JsonIgnoreProperties(value = {"purchasePrice", "id"})
 @Entity
@@ -14,7 +16,9 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Size(min = 3, max = 25)
     private String name;
+    @Min(value = 1)
     private int price;
     //@JsonIgnore
     private int purchasePrice;
